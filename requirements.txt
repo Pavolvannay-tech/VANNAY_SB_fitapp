@@ -3,3 +3,4 @@ supabase
 python-dotenv
 flask-session
 gunicorn
+python-dateutil
