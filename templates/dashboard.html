@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Header / Welcome -->
+    <div class="col-12 text-center text-md-start mb-4">
+        <h1 class="text-white">Nazdar, <span class="text-gradient-blue">{{ session.get('name', 'Pripravený na tréning?') }}</span>! 👋</h1>
+        <p class="text-secondary fs-5">Tvoj osobný progres centrum.</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="col-md-4">
+        <div class="glass-card text-center">
+            <p class="text-secondary mb-1 outfit text-uppercase small opacity-75">Celkovo tréningov</p>
+            <h2 class="mb-0 text-white display-5">{{ total_workouts }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="glass-card text-center">
+            <p class="text-secondary mb-1 outfit text-uppercase small opacity-75">Tento týždeň</p>
+            <h2 class="mb-0 text-white display-5">{{ week_workouts }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="glass-card text-center" style="border-color: rgba(255, 193, 7, 0.2);">
+            <p class="text-secondary mb-1 outfit text-uppercase small opacity-75">Aktuálny Streak</p>
+            <h2 class="mb-0 text-warning display-5">{{ streak }} 🔥</h2>
+        </div>
+    </div>
+
+    <!-- Today's Workout -->
+    <div class="col-12 mt-4">
+        <div class="glass-card border-0 p-0 overflow-hidden" style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.05), rgba(0, 245, 255, 0.05)); border: 1px solid rgba(0, 122, 255, 0.1) !important;">
+            <div class="card-body p-4 p-md-5">
+                {% if not today_workout %}
+                    <div class="text-center py-5">
+                        <h2 class="text-white mb-3">Dnes regeneruješ 🛌</h2>
+                        <p class="text-secondary fs-5 mx-auto mb-4" style="max-width: 600px;">
+                            Svaly rastú počas oddychu, nie počas tréningu. Uži si voľno a naber sily na zajtra.
+                        </p>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <a href="{{ url_for('workout.start') }}" class="btn btn-outline-premium">Otvoriť kalendár</a>
+                            <a href="{{ url_for('onboarding.step1') }}" class="btn btn-link text-secondary text-decoration-none small" onclick="return confirm('Naozaj chceš prerobiť celý program?');">Upraviť program</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="row align-items-center">
+                        <div class="col-md-7 mb-4 mb-md-0">
+                            <span class="badge badge-premium mb-3">Dnešná Výzva</span>
+                            <h1 class="text-white display-4 mb-2">{{ today_workout.day_type }} Session</h1>
+                            <p class="text-secondary fs-5 mb-4">Konzistentnosť je matka progresu. Poďme na to.</p>
+                            <div class="d-flex gap-3">
+                                <a href="{{ url_for('workout.session_workout', workout_day_id=today_workout.id) }}" class="btn btn-premium px-5 py-3">Začať tréning 🚀</a>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="glass-card p-4 h-100" style="background: rgba(255,255,255,0.02);">
+                                <h5 class="text-white mb-3 outfit border-bottom border-white border-opacity-10 pb-2">Plán cvikov</h5>
+                                <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+                                    {% for ex in exercises %}
+                                    <li class="d-flex justify-content-between align-items-center py-2 border-bottom border-white border-opacity-5">
+                                        <span class="text-white opacity-90 small">{{ ex.name }}</span>
+                                        <span class="badge bg-white bg-opacity-10 text-cyan small">{{ ex.sets_working }}s | {{ ex.reps_min }}-{{ ex.reps_max }}r</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

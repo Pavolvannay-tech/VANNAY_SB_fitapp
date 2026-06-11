@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="mb-4">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-cyan outfit small tracking-widest opacity-75">VOLITEĽNÉ PARTIE</span>
+                <span class="text-white outfit small">80%</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar" role="progressbar" style="width: 80%;"></div>
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <h2 class="text-white mb-3 outfit">RELAČNÉ DOPLNKY <span class="text-secondary opacity-50 small fs-6">(4/5)</span></h2>
+            <p class="text-secondary fs-5 mb-5 outfit small">Čomu sa chceš venovať viac?</p>
+            
+            <form method="POST" action="{{ url_for('onboarding.step4') }}">
+                <div class="d-flex flex-column gap-3 mb-5">
+                    {% set bonus_parts = [
+                        ('rear_delts', 'Zadné ramená', 'Face Pull / Rear Delt Fly'),
+                        ('brachialis', 'Brachialis', 'Hammer Curl'),
+                        ('adduction', 'Addukcia', 'Leg Adduction Machine'),
+                        ('abs', 'Brucho', 'Ab Crunches'),
+                        ('calves', 'Lýtka', 'Calf Raises'),
+                        ('forearms', 'Predlaktia', 'Inner Forearm Curl')
+                    ] %}
+
+                    {% for id, name, desc in bonus_parts %}
+                    <div class="glass-card p-3 d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.02);">
+                        <div>
+                            <span class="text-white outfit d-block">{{ name | upper }}</span>
+                            <small class="text-secondary opacity-50">{{ desc }}</small>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="{{ id }}" name="wants_{{ id }}" style="transform: scale(1.4);">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="d-flex justify-content-between mt-5">
+                    <a href="{{ url_for('onboarding.step3') }}" class="btn btn-link text-secondary text-decoration-none outfit small tracking-widest">BACK</a>
+                    <button type="submit" class="btn btn-premium px-5 py-3 outfit tracking-widest">NEXT →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

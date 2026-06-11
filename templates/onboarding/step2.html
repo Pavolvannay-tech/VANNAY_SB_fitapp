@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="mb-4">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-cyan outfit small tracking-widest opacity-75">TRÉNINGOVÝ PROFIL</span>
+                <span class="text-white outfit small">40%</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar" role="progressbar" style="width: 40%;"></div>
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <h2 class="text-white mb-3 outfit">AKO TRÉNUJEŠ? <span class="text-secondary opacity-50 small fs-6">(2/5)</span></h2>
+            <p class="text-secondary fs-5 mb-5 outfit small">Nastavíme obtiažnosť a frekvenciu.</p>
+            
+            <form method="POST" action="{{ url_for('onboarding.step2') }}" class="needs-validation" novalidate>
+                <div class="mb-5">
+                    <label class="text-secondary outfit small tracking-widest mb-3">SKÚSENOSTI</label>
+                    <div class="d-flex flex-column gap-2">
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="experience" value="beginner" required>
+                            <span class="text-white outfit">ZAČIATOČNÍK <small class="text-secondary opacity-50 ms-2">(< 6 mes.)</small></span>
+                        </label>
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="experience" value="intermediate" required>
+                            <span class="text-white outfit">MIERNE POKROČILÝ <small class="text-secondary opacity-50 ms-2">(6-18 mes.)</small></span>
+                        </label>
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="experience" value="advanced" required>
+                            <span class="text-white outfit">POKROČILÝ <small class="text-secondary opacity-50 ms-2">(18+ mes.)</small></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-5">
+                    <label class="text-secondary outfit small tracking-widest mb-3">FREKVENCIA TRÉNINGOV</label>
+                    <div class="row g-2 text-center">
+                        {% for day in [2, 3, 4, 5] %}
+                        <div class="col-3">
+                            <label class="w-100">
+                                <input type="radio" class="btn-check" name="training_days" value="{{ day }}" id="d{{ day }}" required>
+                                <div class="btn btn-outline-premium w-100 py-3 rounded-12 outfit small">
+                                    {{ day }} DNI
+                                    {% if day == 4 %}<br><small class="text-cyan x-small">BEST</small>{% endif %}
+                                </div>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mb-5">
+                    <label class="text-secondary outfit small tracking-widest mb-3">TRVANIE SÉSIE</label>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="w-100">
+                                <input type="radio" class="btn-check" name="session_duration" value="90" required>
+                                <div class="btn btn-outline-premium w-100 py-4 rounded-12 outfit small">DO 90 MIN</div>
+                            </label>
+                        </div>
+                        <div class="col-6">
+                            <label class="w-100">
+                                <input type="radio" class="btn-check" name="session_duration" value="120" required>
+                                <div class="btn btn-outline-premium w-100 py-4 rounded-12 outfit small">90+ MIN</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-5">
+                    <a href="{{ url_for('onboarding.step1') }}" class="btn btn-link text-secondary text-decoration-none outfit small tracking-widest">BACK</a>
+                    <button type="submit" class="btn btn-premium px-5 py-3 outfit tracking-widest">NEXT →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-12 { border-radius: 12px; }
+    .x-small { font-size: 0.6rem; }
+    .pointer { cursor: pointer; transition: all 0.2s ease; }
+    .pointer:hover { background: rgba(255,255,255,0.05) !important; }
+</style>
+{% endblock %}

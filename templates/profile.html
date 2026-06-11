@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center g-4">
+    <!-- Basic Info Form -->
+    <div class="col-lg-5">
+        <div class="glass-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-white border-opacity-10">
+                <h5 class="mb-0 text-white outfit">NASTAVENIA PROFILU</h5>
+                <span class="badge badge-premium small">{{ user.email }}</span>
+            </div>
+            <form method="POST" action="{{ url_for('profile.update') }}">
+                <div class="mb-4">
+                    <label class="text-white outfit small tracking-widest mb-1">MENO / PREZÝVKA</label>
+                    <input type="text" class="form-control" name="name" value="{{ user.name }}" required>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <label class="text-white outfit small tracking-widest mb-1">VEK</label>
+                        <input type="number" class="form-control" name="age" value="{{ user.age }}" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-white outfit small tracking-widest mb-1">POHLAVIE</label>
+                        <select class="form-select bg-black text-white border-white border-opacity-10 outfit small" name="gender" style="height: 48px; background: rgba(255,255,255,0.05);">
+                            <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Muž</option>
+                            <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Žena</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-4 pt-2">
+                    <div class="col-6">
+                        <label class="text-white outfit small tracking-widest mb-1">VÝŠKA (CM)</label>
+                        <input type="number" class="form-control" name="height_cm" value="{{ user.height_cm }}" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-white outfit small tracking-widest mb-1">VÁHA (KG)</label>
+                        <input type="number" step="0.1" class="form-control opacity-50" name="weight_kg" value="{{ user.weight_kg }}" disabled>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-premium w-100 py-3 mt-2">ULOŽIŤ ÚDAJE</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Body Weight Tracking -->
+    <div class="col-lg-7">
+        <div class="glass-card h-100 d-flex flex-column">
+            <h5 class="text-white outfit mb-4">SLEDOVANIE VÁHY</h5>
+            <form method="POST" action="{{ url_for('profile.log_weight') }}" class="row g-2 mb-4 align-items-end mx-0 bg-white bg-opacity-5 p-3 rounded-20">
+                <div class="col-sm-5">
+                    <label class="text-white outfit small tracking-widest mb-1" style="font-size: 0.65rem;">DÁTUM</label>
+                    <input type="date" class="form-control form-control-sm border-0 bg-transparent outfit" name="date" value="{{ today }}" max="{{ today }}" required>
+                </div>
+                <div class="col-sm-4">
+                    <label class="text-white outfit small tracking-widest mb-1" style="font-size: 0.65rem;">VÁHA (KG)</label>
+                    <input type="number" step="0.1" class="form-control form-control-sm border-0 bg-transparent text-cyan outfit fw-bold" name="weight_kg" placeholder="{{ user.weight_kg }}" required>
+                </div>
+                <div class="col-sm-3">
+                    <button type="submit" class="btn btn-outline-premium w-100 py-2 small">LOG</button>
+                </div>
+            </form>
+            
+            <div class="flex-grow-1 position-relative mt-2" style="min-height: 250px;">
+                <canvas id="weightChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Program Overview -->
+    <div class="col-12 mt-4">
+        <div class="glass-card p-0 overflow-hidden">
+            <div class="px-4 py-4 border-bottom border-white border-opacity-10 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: rgba(255,255,255,0.02);">
+                <h5 class="mb-0 text-white outfit">ROZVRH TRÉNINGOV (<span class="text-cyan">{{ program.split_type if program else 'NONE' }}</span>)</h5>
+                <form method="POST" action="{{ url_for('onboarding.step1') }}" onsubmit="if(!confirm('Zmazať a vygenerovať nový program?')) return false;">
+                    <button type="submit" class="btn btn-sm btn-link text-pink text-decoration-none outfit small tracking-widest">REGENERATE PROGRAM</button>
+                </form>
+            </div>
+            <div class="p-0">
+                <div class="table-responsive">
+                    <table class="table table-borderless mb-0 align-middle">
+                        <thead class="border-bottom border-white border-opacity-5">
+                            <tr class="text-secondary outfit tracking-widest opacity-50" style="font-size: 0.7rem;">
+                                <th class="py-3 px-4" style="width: 200px;">DEŇ</th>
+                                <th class="py-3">ŠTRUKTÚRA TRÉNINGU</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for wd in workout_days %}
+                            <tr class="border-bottom border-white border-opacity-5">
+                                <td class="px-4 py-4">
+                                    <h6 class="mb-1 text-white outfit">{{ ['PONDELOK', 'UTOROK', 'STREDA', 'ŠTVRTOK', 'PIATOK', 'SOBOTA', 'NEDEĽA'][wd.day_of_week] }}</h6>
+                                    <span class="badge badge-premium small">{{ wd.day_type }}</span>
+                                </td>
+                                <td class="py-4 px-4 text-nowrap" style="overflow-x: auto;">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% for ex in wd.exercises %}
+                                        <div class="glass-card p-2 px-3 border-0 d-flex align-items-center gap-2" style="background: rgba(255,255,255,0.03); border-radius: 10px;">
+                                            <span class="text-white opacity-90 small">{{ ex.name }}</span>
+                                            <span class="text-cyan outfit small fw-bold" style="font-size: 0.7rem;">{{ ex.sets_working }}x{{ ex.reps_min }}-{{ ex.reps_max }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="2" class="text-center py-5 text-secondary opacity-50 small outfit">Zatiaľ nemáš aktívny program.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/profile/api/weight-history')
+        .then(response => response.json())
+        .then(data => {
+            if (data.labels.length === 0) {
+                document.getElementById('weightChart').parentNode.innerHTML = '<div class="h-100 d-flex align-items-center justify-content-center text-secondary opacity-50 small outfit">Žiadne dáta</div>';
+                return;
+            }
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            
+            let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(0, 245, 255, 0.2)');
+            gradient.addColorStop(1, 'rgba(0, 245, 255, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels.map(l => l.substring(5)), // MM-DD
+                    datasets: [{
+                        label: 'Váha (kg)',
+                        data: data.weights,
+                        borderColor: '#00F5FF',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#00F5FF',
+                        pointBorderColor: '#060608',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { 
+                            backgroundColor: '#121214',
+                            titleFont: { family: 'Outfit', size: 12 },
+                            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+                            padding: 12,
+                            displayColors: false,
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false },
+                            ticks: { font: { family: 'Outfit', size: 10 }, color: 'rgba(255,255,255,0.3)' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Outfit', size: 10 }, color: 'rgba(255,255,255,0.3)' }
+                        }
+                    }
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

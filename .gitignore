@@ -1,0 +1,8 @@
+.env
+.flask_session/
+__pycache__/
+*.pyc
+_agents/
+.gemini/
+venv/
+.venv/

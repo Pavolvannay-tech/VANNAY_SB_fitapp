@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-9 text-center">
+        <div class="mb-4 animate-fade">
+             <h1 class="display-1 mb-2">🔥</h1>
+             <h1 class="text-white outfit display-4 mb-2">SESSION COMPLETE</h1>
+             <p class="text-secondary fs-5 outfit small tracking-widest opacity-75">O KROK BLIŽŠIE K CIEĽU</p>
+        </div>
+        
+        <div class="row text-center g-4 mb-5">
+            <div class="col-md-4">
+                <div class="glass-card">
+                    <p class="text-secondary outfit small tracking-widest opacity-50 text-uppercase mb-2">TRVANIE</p>
+                    <h2 class="text-white outfit display-5 mb-0">{{ duration_str }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card" style="border-color: rgba(255, 193, 7, 0.2);">
+                    <p class="text-secondary outfit small tracking-widest opacity-50 text-uppercase mb-2">STREAK</p>
+                    <h2 class="text-warning outfit display-5 mb-0">{{ streak }} 🔥</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card" style="border-color: var(--accent-green-op);">
+                    <p class="text-secondary outfit small tracking-widest opacity-50 text-uppercase mb-2">PROGRES</p>
+                    <h2 class="text-neon-green outfit display-5 mb-0">{{ progress_count }} / {{ total_exercises }} <small class="fs-6 opacity-50">CVIKOV</small></h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Podrobná analýza sérií -->
+        <div class="glass-card text-start p-0 overflow-hidden mb-5">
+            <div class="px-4 py-3 border-bottom border-white border-opacity-10" style="background: rgba(255,255,255,0.02);">
+                <h5 class="mb-0 text-white outfit small tracking-widest">ANALYTIKA SÉRIÍ</h5>
+            </div>
+            <div class="p-4">
+                <div class="row text-center g-3">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 glass-card border-0" style="background: rgba(57, 255, 20, 0.05);">
+                            <p class="text-neon-green outfit tracking-widest mb-1" style="font-size: 0.6rem;">PROGRESNUTÉ</p>
+                            <h3 class="text-white outfit mb-0">{{ progresnute }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 glass-card border-0" style="background: rgba(0, 245, 255, 0.05);">
+                            <p class="text-cyan outfit tracking-widest mb-1" style="font-size: 0.6rem;">ROVNAKÉ</p>
+                            <h3 class="text-white outfit mb-0">{{ rovnake }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 glass-card border-0" style="background: rgba(255, 20, 147, 0.05);">
+                            <p class="text-pink outfit tracking-widest mb-1" style="font-size: 0.6rem;">NEPROGRESNUTÉ</p>
+                            <h3 class="text-white outfit mb-0">{{ neprogresnute }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 glass-card border-0" style="background: rgba(255, 255, 255, 0.03);">
+                            <p class="text-secondary outfit tracking-widest mb-1" style="font-size: 0.6rem;">SKIPNUTÉ</p>
+                            <h3 class="text-white outfit mb-0">{{ skipnute }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-premium btn-lg px-5 py-3 outfit tracking-widest mb-5">SPÄŤ NA DASHBOARD</a>
+    </div>
+</div>
+{% endblock %}

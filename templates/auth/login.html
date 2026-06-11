@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-6 col-lg-4">
+        <div class="text-center mb-5 animate-fade">
+            <h1 class="text-white outfit display-4 mb-1">VITAJ <span class="text-gradient-blue">DOMA</span></h1>
+            <p class="text-secondary outfit small tracking-widest opacity-75">POKRAČUJ V SVOJEJ CESTE</p>
+        </div>
+
+        <div class="glass-card">
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="text-secondary outfit small tracking-widest mb-2">EMAIL</label>
+                    <input type="email" name="email" class="form-control" placeholder="Tvoj email" required>
+                </div>
+                <div class="mb-5">
+                    <label class="text-secondary outfit small tracking-widest mb-2">HESLO</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-premium w-100 py-3 mb-4">PRIHLÁSIŤ SA</button>
+                <div class="text-center">
+                    <p class="text-secondary outfit small mb-0">Ešte nemáš účet? <a href="{{ url_for('auth.register') }}" class="text-cyan text-decoration-none">Zaregistruj sa</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

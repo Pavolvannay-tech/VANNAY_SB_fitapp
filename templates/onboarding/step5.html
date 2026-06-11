@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="mb-4">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-cyan outfit small tracking-widest opacity-75">VÝŽIVA A CIELE</span>
+                <span class="text-white outfit small">100%</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar" role="progressbar" style="width: 100%; background: var(--accent-green);"></div>
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <h2 class="text-white mb-3 outfit">PALIVO A PROGRES <span class="text-secondary opacity-50 small fs-6">(5/5)</span></h2>
+            <p class="text-secondary fs-5 mb-5 outfit small">Finálny krok k tvojmu novému ja.</p>
+            
+            <form method="POST" action="{{ url_for('onboarding.step5') }}" class="needs-validation" novalidate>
+                <div class="mb-5">
+                    <label class="text-secondary outfit small tracking-widest mb-3">DENNÁ AKTIVITA</label>
+                    <div class="d-flex flex-column gap-2">
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="activity_level" value="sedentary" required>
+                            <span class="text-white outfit">SEDAVÝ TYP <small class="text-secondary opacity-50 ms-2">(Kancelária, málo pohybu)</small></span>
+                        </label>
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="activity_level" value="moderate" required>
+                            <span class="text-white outfit">MIERNE AKTÍVNY <small class="text-secondary opacity-50 ms-2">(7-10k krokov)</small></span>
+                        </label>
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="activity_level" value="active" required>
+                            <span class="text-white outfit">FYZICKY AKTÍVNY <small class="text-secondary opacity-50 ms-2">(12k+ krokov)</small></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-5">
+                    <label class="text-secondary outfit small tracking-widest mb-3">TVOJ CIEĽ</label>
+                    <div class="d-flex flex-column gap-2">
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="goal" value="bulk" required>
+                            <span class="text-white outfit">🏗️ JEMNÝ BULK <small class="text-secondary opacity-50 ms-2">(Budovanie svalov)</small></span>
+                        </label>
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="goal" value="maintain" required>
+                            <span class="text-white outfit">⚖️ MAINTENANCE <small class="text-secondary opacity-50 ms-2">(Udržiavačka)</small></span>
+                        </label>
+                        <label class="glass-card p-3 mb-0 pointer" style="background: rgba(255,255,255,0.02); cursor: pointer;">
+                            <input class="form-check-input me-3" type="radio" name="goal" value="cut" required>
+                            <span class="text-white outfit">🔥 SHRED / CUT <small class="text-secondary opacity-50 ms-2">(Pálenie tukov)</small></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-5">
+                    <a href="{{ url_for('onboarding.step4') }}" class="btn btn-link text-secondary text-decoration-none outfit small tracking-widest">BACK</a>
+                    <button type="submit" class="btn btn-premium px-5 py-3 outfit tracking-widest" style="background: var(--accent-green); box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);">GENEROVAŤ PROGRAM 🚀</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .pointer { cursor: pointer; transition: all 0.2s ease; }
+    .pointer:hover { background: rgba(255,255,255,0.05) !important; }
+</style>
+{% endblock %}

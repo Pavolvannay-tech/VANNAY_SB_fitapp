@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    
+    <!-- Header -->
+    <div class="col-lg-8 col-12 d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="text-white mb-1 outfit">KALENDÁR</h1>
+            <p class="text-secondary fs-5 mb-0 outfit small tracking-widest opacity-75">AKTÍVNY SPLIT: <span class="text-cyan">{{ program.split_type }}</span></p>
+        </div>
+        <a href="{{ url_for('profile.training_settings') }}" class="btn btn-outline-premium">
+            Upraviť split
+        </a>
+    </div>
+
+    <!-- Mesačný Kalendár -->
+    <div class="col-lg-8 col-12">
+        <div class="glass-card p-0 overflow-hidden">
+            <div class="px-4 py-3 border-bottom border-white border-opacity-10 d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.02);">
+                <h5 class="mb-0 text-white outfit small tracking-widest">PREHĽAD DNÍ</h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-premium py-1 px-2" id="prev-month-btn" style="border: 1px solid rgba(255,255,255,0.1);">&lt;</button>
+                    <span class="text-white outfit small tracking-widest align-self-center px-2" id="month-title-display">...</span>
+                    <button class="btn btn-sm btn-outline-premium py-1 px-2" id="next-month-btn" style="border: 1px solid rgba(255,255,255,0.1);">&gt;</button>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="table-responsive">
+                    <table class="table table-borderless text-center align-middle mb-0" id="calendar-table">
+                        <thead>
+                            <tr class="text-secondary outfit tracking-widest opacity-50" style="font-size: 0.7rem;">
+                                <th style="width: 14%;">PO</th>
+                                <th style="width: 14%;">UT</th>
+                                <th style="width: 14%;">ST</th>
+                                <th style="width: 14%;">ŠT</th>
+                                <th style="width: 14%;">PI</th>
+                                <th style="width: 14%;">SO</th>
+                                <th style="width: 14%;">NE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendar-body">
+                            <!-- Vygenerované pomocou JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 border-top border-white border-opacity-5 pt-4 d-flex flex-wrap gap-4 justify-content-center small text-secondary">
+                    <div class="d-flex align-items-center gap-2 outfit tracking-widest" style="font-size: 0.6rem;">
+                        <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: var(--accent-blue);"></span> PLÁN
+                    </div>
+                    <div class="d-flex align-items-center gap-2 outfit tracking-widest" style="font-size: 0.6rem;">
+                        <span class="rounded-circle d-inline-block" style="width: 8px; height: 8px; background-color: var(--accent-green);"></span> HOTOVO
+                    </div>
+                    <div class="d-flex align-items-center gap-2 outfit tracking-widest" style="font-size: 0.6rem;">
+                        <span class="d-inline-block border border-cyan rounded-circle" style="width: 10px; height: 10px; box-shadow: 0 0 5px var(--accent-cyan);"></span> DNES
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Modal pre výber tréningu z kalendára -->
+<div class="modal fade" id="selectWorkoutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card p-0 border-0 overflow-hidden">
+            <div class="modal-header border-bottom border-white border-opacity-10 bg-black bg-opacity-20 px-4 py-3">
+                <h5 class="modal-title outfit text-white" id="modal-date-title">Záznam tréningu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-secondary small mb-4" id="modal-date-desc">Ktorý tréning chceš zaznamenať?</p>
+                <div class="d-flex flex-column gap-2" id="modal-workout-list">
+                    {% for wd in workout_days %}
+                    <button type="button" class="btn btn-outline-premium text-start p-3 outfit d-flex justify-content-between align-items-center" onclick="launchWorkout('{{ wd.id }}')" style="border-color: rgba(255,255,255,0.1); color: white;">
+                        <span>{{ wd.day_type }}</span>
+                        <span class="badge border border-white border-opacity-10 text-secondary small">Vybrať</span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3">
+                <button type="button" class="btn btn-sm btn-link text-secondary text-decoration-none mx-auto" data-bs-dismiss="modal">Zrušiť</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Zoznam dokončených tréningov
+    const completedLogs = {};
+    {% for log in workout_logs %}
+        completedLogs['{{ log.date }}'] = {
+            day_type: '{{ log.day_type }}',
+            total_volume: '{{ log.total_volume_kg }}'
+        };
+    {% endfor %}
+
+    // Plánované tréningové dni (dni v týždni 0-6)
+    const scheduledDays = [];
+    {% for wd in workout_days %}
+        scheduledDays.push({{ wd.day_of_week }});
+    {% endfor %}
+
+    // Aktuálny kalendárny stav
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth(); // 0 = Január, 11 = December
+    let selectedDateStr = '';
+
+    const monthNames = [
+        "Január", "Február", "Marec", "Apríl", "Máj", "Jún",
+        "Júl", "August", "September", "Október", "November", "December"
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderCalendar();
+        
+        document.getElementById('prev-month-btn').addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+
+        document.getElementById('next-month-btn').addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+    });
+
+    function renderCalendar() {
+        const titleNode = document.getElementById('month-title-display');
+        titleNode.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+
+        const bodyNode = document.getElementById('calendar-body');
+        bodyNode.innerHTML = '';
+
+        // Prvý deň v mesiaci
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        // Deň v týždni pre prvý deň (0=Nedeľa v JS, zmeníme na 0=Pondelok)
+        let firstDayDow = firstDay.getDay() - 1;
+        if (firstDayDow < 0) firstDayDow = 6; // Nedeľa je 6
+
+        // Počet dní v aktuálnom mesiaci
+        const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        // Počet dní v predošlom mesiaci
+        const prevMonthTotalDays = new Date(currentYear, currentMonth, 0).getDate();
+
+        let row = document.createElement('tr');
+        let dayCounter = 1;
+        let nextMonthCounter = 1;
+
+        // Vykreslenie sivých dní predošlého mesiaca na začiatku
+        for (let i = 0; i < firstDayDow; i++) {
+            const td = document.createElement('td');
+            const dayNum = prevMonthTotalDays - firstDayDow + i + 1;
+            td.className = 'text-secondary opacity-10 p-3 small outfit';
+            td.innerText = dayNum;
+            row.appendChild(td);
+        }
+
+        // Dni aktuálneho mesiaca
+        for (let i = firstDayDow; dayCounter <= totalDays; i++) {
+            if (i > 0 && i % 7 === 0) {
+                bodyNode.appendChild(row);
+                row = document.createElement('tr');
+            }
+
+            const td = document.createElement('td');
+            td.className = 'p-2 position-relative';
+            
+            const currentDayVal = dayCounter;
+            const dayStr = String(currentDayVal).padStart(2, '0');
+            const monthStr = String(currentMonth + 1).padStart(2, '0');
+            const dateStr = `${currentYear}-${monthStr}-${dayStr}`;
+
+            const cellWrapper = document.createElement('div');
+            cellWrapper.className = 'd-flex flex-column align-items-center justify-content-center mx-auto rounded-circle outfit';
+            cellWrapper.style.width = '42px';
+            cellWrapper.style.height = '42px';
+            cellWrapper.style.cursor = 'pointer';
+            cellWrapper.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+            cellWrapper.innerText = currentDayVal;
+
+            // Zistenie dňa v týždni
+            const thisDate = new Date(currentYear, currentMonth, currentDayVal);
+            let dow = thisDate.getDay() - 1;
+            if (dow < 0) dow = 6;
+
+            // Dnešný deň?
+            const today = new Date();
+            const isToday = today.getDate() === currentDayVal && today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+
+            if (isToday) {
+                cellWrapper.style.border = '1px solid var(--accent-cyan)';
+                cellWrapper.style.boxShadow = '0 0 10px rgba(0, 245, 255, 0.3)';
+                cellWrapper.style.fontWeight = '700';
+                cellWrapper.style.color = 'var(--accent-cyan)';
+            }
+
+            // Je naplánovaný tréning? (plánované dni splitu)
+            const isScheduled = scheduledDays.includes(dow);
+
+            // Odcvičený tréning?
+            const isCompleted = completedLogs[dateStr] !== undefined;
+
+            if (isCompleted) {
+                // Zelená pre hotový tréning
+                cellWrapper.style.backgroundColor = 'rgba(57, 255, 20, 0.2)';
+                cellWrapper.style.border = '1px solid var(--accent-green)';
+                cellWrapper.style.color = '#fff';
+                cellWrapper.style.fontWeight = 'bold';
+                cellWrapper.title = `Odcvičené: ${completedLogs[dateStr].day_type}`;
+            } else if (isScheduled) {
+                // Modrá bodka pre plánovaný deň
+                const dot = document.createElement('div');
+                dot.className = 'position-absolute rounded-circle';
+                dot.style.width = '4px';
+                dot.style.height = '4px';
+                dot.style.backgroundColor = 'var(--accent-blue)';
+                dot.style.bottom = '4px';
+                dot.style.left = '50%';
+                dot.style.transform = 'translateX(-50%)';
+                td.appendChild(dot);
+                
+                cellWrapper.addEventListener('mouseenter', () => {
+                    cellWrapper.style.backgroundColor = 'rgba(0, 122, 255, 0.1)';
+                    cellWrapper.style.transform = 'scale(1.1)';
+                });
+                cellWrapper.addEventListener('mouseleave', () => {
+                    cellWrapper.style.backgroundColor = 'transparent';
+                    cellWrapper.style.transform = 'scale(1)';
+                });
+            } else {
+                cellWrapper.addEventListener('mouseenter', () => {
+                    cellWrapper.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+                    cellWrapper.style.transform = 'scale(1.1)';
+                });
+                cellWrapper.addEventListener('mouseleave', () => {
+                    cellWrapper.style.backgroundColor = 'transparent';
+                    cellWrapper.style.transform = 'scale(1)';
+                });
+            }
+
+            // Click event na deň v kalendári
+            cellWrapper.addEventListener('click', () => {
+                const clickDate = new Date(currentYear, currentMonth, currentDayVal);
+                const todayMidnight = new Date();
+                todayMidnight.setHours(0,0,0,0);
+                
+                const todayEnd = new Date();
+                todayEnd.setHours(23, 59, 59, 999);
+                
+                const todayObj = new Date();
+                const todayY = todayObj.getFullYear();
+                const todayM = String(todayObj.getMonth() + 1).padStart(2, '0');
+                const todayD = String(todayObj.getDate()).padStart(2, '0');
+                const todayDateStr = `${todayY}-${todayM}-${todayD}`;
+                const isCheckToday = dateStr === todayDateStr;
+                
+                if (isCompleted) {
+                    if (isCheckToday) {
+                        if (!confirm(`Dnes si už tréning úspešne zaznamenal (${completedLogs[dateStr].day_type}). Chceš ho spustiť znova a prepísať dnešné dáta?`)) {
+                            return;
+                        }
+                    } else {
+                        alert(`Tento deň si úspešne odcvičil: ${completedLogs[dateStr].day_type}`);
+                        return;
+                    }
+                }
+                
+                if (clickDate > todayEnd) {
+                    alert("Nemôžeš si zapísať tréning do budúcnosti!");
+                    return;
+                }
+                
+                if (clickDate < todayMidnight) {
+                    alert("Zapisovanie starých tréningov je zakázané. Sústreď sa na dnešok!");
+                    return;
+                }
+                
+                selectedDateStr = dateStr;
+                const readableDate = `${currentDayVal}. ${monthNames[currentMonth]} ${currentYear}`;
+                document.getElementById('modal-date-title').innerText = `Dnes: ${readableDate}`;
+                
+                const myModal = new bootstrap.Modal(document.getElementById('selectWorkoutModal'));
+                myModal.show();
+            });
+
+            td.appendChild(cellWrapper);
+            row.appendChild(td);
+            dayCounter++;
+        }
+
+        // Vykreslenie sivých dní nasledujúceho mesiaca na konci
+        let remainingCells = 7 - (row.children.length % 7);
+        if (remainingCells < 7) {
+            for (let i = 0; i < remainingCells; i++) {
+                const td = document.createElement('td');
+                td.className = 'text-secondary opacity-10 p-3 small outfit';
+                td.innerText = nextMonthCounter;
+                row.appendChild(td);
+                nextMonthCounter++;
+            }
+        }
+        bodyNode.appendChild(row);
+    }
+
+    function launchWorkout(workoutDayId) {
+        window.location.href = `/workout/session/${workoutDayId}?date=${selectedDateStr}`;
+    }
+</script>
+
+<style>
+    #calendar-table th, #calendar-table td {
+        padding: 12px 4px;
+    }
+</style>
+{% endblock %}

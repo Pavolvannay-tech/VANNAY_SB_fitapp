@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="mb-4">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-cyan outfit small tracking-widest opacity-75">VÝBER CVIKOV</span>
+                <span class="text-white outfit small">60%</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar" role="progressbar" style="width: 60%;"></div>
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <h2 class="text-white mb-3 outfit">ZVOL SI CVIKY <span class="text-secondary opacity-50 small fs-6">(3/5)</span></h2>
+            <p class="text-secondary fs-5 mb-5 outfit small">Zvoľ cviky, ktoré ti biomechanicky sedia.</p>
+            
+            <form method="POST" action="{{ url_for('onboarding.step3') }}" class="needs-validation" novalidate>
+                <div class="row g-4 mb-5">
+                    {% set areas = [
+                        ('exercise_chest_flat', 'Hrudník (Flat)'),
+                        ('exercise_chest_incline', 'Hrudník (Incline)'),
+                        ('exercise_back_vertical', 'Chrbát (Zhyby/Sťahovanie)'),
+                        ('exercise_back_horizontal_wide', 'Chrbát (Príťahy široko)'),
+                        ('exercise_back_horizontal_close', 'Chrbát (Príťahy úzko)'),
+                        ('exercise_shoulders', 'Ramená (Tlaky)'),
+                        ('exercise_triceps', 'Triceps'),
+                        ('exercise_biceps', 'Biceps'),
+                        ('exercise_quads', 'Stehná (Kvadricepse)'),
+                        ('exercise_hamstrings', 'Stehná (Hamstringy)')
+                    ] %}
+                    
+                    {% set options = {
+                        'exercise_chest_flat': ['Flat Bench Press', 'Pec Deck', 'Cable Chest Flyes'],
+                        'exercise_chest_incline': ['Incline Barbell Press', 'Incline DB Press', 'Smith Machine Incline'],
+                        'exercise_back_vertical': ['Pull-ups / Chin-ups', 'Lat Pulldown', 'Cable Pulldown'],
+                        'exercise_back_horizontal_wide': ['Barbell Row', 'DB Row', 'Cable Row (Wide)'],
+                        'exercise_back_horizontal_close': ['Close Grip Cable Row', 'Machine Row', 'T-Bar Row'],
+                        'exercise_shoulders': ['Overhead Barbell Press', 'DB Shoulder Press', 'Machine Shoulder Press'],
+                        'exercise_triceps': ['Triceps Pulldown', 'Skull Crushers', 'Dips'],
+                        'exercise_biceps': ['Barbell Curl', 'Preacher Curl', 'Incline DB Curl'],
+                        'exercise_quads': ['Squat', 'Hack Squat', 'Leg Press'],
+                        'exercise_hamstrings': ['Romanian Deadlift', 'Leg Curl Machine', 'DB RDL']
+                    } %}
+
+                    {% for field, label in areas %}
+                    <div class="col-md-6">
+                        <label class="text-secondary outfit small tracking-widest mb-2">{{ label | upper }}</label>
+                        <select name="{{ field }}" class="form-select bg-black text-white border-white border-opacity-10 outfit py-2" required style="background: rgba(255,255,255,0.05);">
+                            <option value="" disabled selected>Vyber...</option>
+                            {% for opt in options[field] %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="d-flex justify-content-between mt-5">
+                    <a href="{{ url_for('onboarding.step2') }}" class="btn btn-link text-secondary text-decoration-none outfit small tracking-widest">BACK</a>
+                    <button type="submit" class="btn btn-premium px-5 py-3 outfit tracking-widest">NEXT →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

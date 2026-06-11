@@ -1,0 +1,248 @@
+/* 
+   FitApp Premium Design System
+   Theme: Cyber-Hypertrophy (Glassmorphism & Neon Accents)
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap');
+
+:root {
+    color-scheme: dark;
+    --bg-main: #060608;
+    --bg-card: rgba(20, 20, 25, 0.7);
+    --accent-blue: #007AFF;
+    --accent-cyan: #00F5FF;
+    --accent-green: #39FF14;
+    --accent-pink: #FF007A;
+    --accent-yellow: #FFB800;
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --text-primary: #FFFFFF;
+    --text-secondary: #CBD5E1; /* Lighter color for better visibility */
+    --glow-blue: rgba(0, 122, 180, 0.4);
+}
+
+/* Modal Fix */
+.modal-content.glass-card {
+    background: rgba(20, 20, 25, 0.95) !important;
+    backdrop-filter: blur(20px);
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .outfit {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* Glassmorphism Classes */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    border-color: rgba(0, 122, 255, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.glass-nav {
+    background: rgba(6, 6, 8, 0.8) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+/* Typography & Colors */
+.text-cyan { color: var(--accent-cyan); }
+.text-yellow { color: var(--accent-yellow) !important; }
+.text-neon-green { color: var(--accent-green); }
+.text-gradient-blue {
+    background: linear-gradient(135deg, #007AFF, #00F5FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Custom Buttons */
+.btn-premium {
+    background: linear-gradient(135deg, var(--accent-blue), #00A3FF);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+}
+
+.btn-premium:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 122, 255, 0.5);
+    color: white;
+}
+
+.btn-outline-premium {
+    background: transparent;
+    border: 1px solid var(--accent-blue);
+    color: var(--accent-blue);
+    border-radius: 12px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-premium:hover {
+    background: var(--accent-blue);
+    color: white;
+    box-shadow: 0 0 15px rgba(0, 122, 255, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+/* Workout Specific */
+.exercise-card {
+    border-left: 4px solid var(--accent-cyan) !important;
+}
+
+.set-row {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.set-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.set-row.done {
+    background: rgba(57, 255, 20, 0.1) !important;
+    border-left: 2px solid var(--accent-green);
+}
+
+/* Progress Bars */
+.progress {
+    background-color: rgba(255, 255, 255, 0.1);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+}
+
+/* Form Inputs */
+.form-control {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 0.25rem rgba(0, 122, 255, 0.15);
+    color: white;
+}
+
+/* Badges */
+.badge-premium {
+    background: rgba(0, 122, 255, 0.15);
+    color: var(--accent-blue);
+    border: 1px solid rgba(0, 122, 255, 0.3);
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+/* Utilities */
+.rounded-20 { border-radius: 20px; }
+.tracking-tight { letter-spacing: -0.02em; }
+
+/* Custom Bootstrap Utility fixes */
+.bg-opacity-5 {
+    --bs-bg-opacity: 0.05 !important;
+}
+
+/* Premium Select Dropdowns */
+.premium-select {
+    display: inline-block;
+    width: auto;
+    min-width: 130px;
+    background-color: rgba(255, 255, 255, 0.04);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2300F5FF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 8px 36px 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.premium-select:hover {
+    border-color: rgba(0, 245, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.1);
+}
+
+.premium-select:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.premium-select option {
+    background-color: #0c0c10;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-weight: normal;
+    padding: 10px;
+}
+
+/* Card actions visibility transition */
+.card-actions {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.card-actions.show-actions {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    max-width: 250px;
+}

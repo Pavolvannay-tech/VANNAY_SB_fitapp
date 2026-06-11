@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="mb-4">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-cyan outfit small tracking-widest opacity-75">ONBOARDING ZÁKLADY</span>
+                <span class="text-white outfit small">20%</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar" role="progressbar" style="width: 20%;"></div>
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <h2 class="text-white mb-3 outfit">KTO SI? <span class="text-secondary opacity-50 small fs-6">(1/5)</span></h2>
+            <p class="text-secondary fs-5 mb-5 outfit small">Tieto údaje potrebujeme pre biológiu tvojho tela.</p>
+            
+            <form method="POST" action="{{ url_for('onboarding.step1') }}" class="needs-validation" novalidate>
+                <div class="mb-5">
+                    <label class="text-secondary outfit small tracking-widest mb-2">MENO / PREZÝVKA</label>
+                    <input type="text" class="form-control form-control-lg" name="name" required placeholder="Napr. Arnold">
+                </div>
+                
+                <div class="row mb-5">
+                    <div class="col-6">
+                        <label class="text-secondary outfit small tracking-widest mb-2">VEK</label>
+                        <input type="number" class="form-control form-control-lg" name="age" min="10" max="100" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-secondary outfit small tracking-widest mb-2">POHLAVIE</label>
+                        <select class="form-select bg-black text-white border-white border-opacity-10 outfit" name="gender" required style="height: 58px; background: rgba(255,255,255,0.05);">
+                            <option value="" selected disabled>Vyber...</option>
+                            <option value="male">Muž</option>
+                            <option value="female">Žena</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mb-5">
+                    <div class="col-6">
+                        <label class="text-secondary outfit small tracking-widest mb-2">VÁHA (KG)</label>
+                        <input type="number" step="0.1" class="form-control form-control-lg" name="weight_kg" min="30" max="300" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-secondary outfit small tracking-widest mb-2">VÝŠKA (CM)</label>
+                        <input type="number" step="1" class="form-control form-control-lg" name="height_cm" min="100" max="250" required>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-premium px-5 py-3 outfit tracking-widest">NEXT →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<input type="hidden" id="workout-date" value="{{ date }}">
+
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+        {% if is_retro %}
+        <div class="glass-card mb-4 text-center border-0" style="background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107 !important;">
+            <p class="mb-0 text-warning fw-bold">⚠️ Zaznamenávaš tréning spätne pre dátum: <span class="badge border border-warning text-warning ms-1">{{ date }}</span></p>
+        </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+            <div>
+                <h1 class="text-white mb-1 outfit text-uppercase">{{ workout.day_type }} Session</h1>
+                <div class="text-cyan outfit tracking-widest small" id="workout-timer">TIME: 00:00</div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-premium border-danger text-danger" id="cancel-btn" style="border-color: rgba(220, 53, 69, 0.4) !important;">Zrušiť</button>
+                <button class="btn btn-premium px-4" id="finish-btn">Dokončiť ✓</button>
+            </div>
+        </div>
+
+        <div id="rest-timer-banner" class="glass-card text-center d-none sticky-top mb-4" style="top: 90px; z-index: 1000; border-color: var(--accent-cyan); background: rgba(0, 245, 255, 0.05);">
+            <div class="d-flex align-items-center justify-content-center gap-4">
+                <div class="outfit tracking-widest text-cyan small">RESTING</div>
+                <div id="rest-time-display" class="display-6 outfit text-white">00:00</div>
+                <button class="btn btn-sm btn-outline-premium border-cyan text-cyan" id="skip-rest-btn">Skip</button>
+            </div>
+        </div>
+
+        <form id="workout-form">
+            <input type="hidden" id="workout_day_id" value="{{ workout.id }}">
+            
+            <div id="exercises-list">
+                {% for ex in exercises %}
+                <div class="glass-card mb-5 exercise-card p-0 overflow-hidden" data-exercise-id="{{ ex.id }}" data-exercise-name="{{ ex.name }}" data-rest="{{ ex.rest_seconds }}">
+                    <div class="px-4 py-3 d-flex justify-content-between align-items-center border-bottom border-white border-opacity-10" style="background: rgba(0,0,0,0.2);">
+                        <h4 class="mb-0 text-white outfit">{{ ex.name }}</h4>
+                        <span class="badge bg-white bg-opacity-10 text-cyan small">{{ ex.sets_working }}s | {{ ex.reps_min }}-{{ ex.reps_max }}r | {{ ex.rest_seconds }}s rest</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="glass-card p-3 mb-4 border-0" style="background: rgba(0, 245, 255, 0.03); border-left: 3px solid var(--accent-cyan) !important; border-radius: 12px;">
+                            <label class="text-cyan outfit tracking-widest mb-1" style="font-size: 0.65rem;">TARGET PRE PROGRES</label>
+                            {% if ex.last_weight %}
+                                <div class="text-white fs-5 outfit">{{ ex.last_weight }}<small class="text-secondary opacity-50 ms-1">kg</small> × {{ ex.last_reps }}<small class="text-secondary opacity-50 ms-1">reps</small></div>
+                                {% if ex.is_compound and ex.wu1_w %}
+                                <div class="text-secondary mt-2 x-small">
+                                    <span class="text-white opacity-50 outfit tracking-widest" style="font-size: 0.6rem;">ROZCVIČKA:</span>
+                                    <span class="ms-2 opacity-75">{{ ex.wu1_w }}kg × {{ ex.wu1_r }}</span> 
+                                    <span class="mx-1 opacity-25">|</span>
+                                    <span class="opacity-75">{{ ex.wu2_w }}kg × {{ ex.wu2_r }}</span>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="text-secondary italic small opacity-75">Žiadne predošlé dáta. Odhadni váhu!</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-borderless align-middle mb-0 text-center">
+                                <thead>
+                                    <tr class="text-secondary outfit tracking-widest opacity-50" style="font-size: 0.7rem;">
+                                        <th style="width: 60px;">SET</th>
+                                        <th>VÁHA (KG)</th>
+                                        <th>REPS</th>
+                                        <th style="width: 80px;">AKCIA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for s in range(1, ex.sets_working + 1) %}
+                                    <tr class="set-row border-bottom border-white border-opacity-5">
+                                        <td class="outfit text-secondary small opacity-50">{{ s }}</td>
+                                        <td>
+                                            <input type="number" step="0.5" class="form-control bg-transparent border-0 text-center text-white fw-bold weight-input p-0" placeholder="{{ ex.last_weight if ex.last_weight else '0' }}" required>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control bg-transparent border-0 text-center text-white fw-bold reps-input p-0" placeholder="{{ ex.last_reps if ex.last_reps else ex.reps_max }}" required>
+                                        </td>
+                                        <td class="py-2">
+                                            <button type="button" class="btn btn-sm btn-outline-premium done-set-btn w-100 p-2" style="border-radius: 8px;">✓</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .x-small { font-size: 0.75rem; }
+    .italic { font-style: italic; }
+    .form-control::placeholder { color: rgba(255,255,255,0.2); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/workout.js') }}"></script>
+{% endblock %}

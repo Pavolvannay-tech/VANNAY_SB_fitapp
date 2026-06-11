@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="text-white mb-1 outfit">TRÉNINGOVÝ PLÁNOVAČ</h1>
+            <p class="text-secondary outfit small tracking-widest opacity-75">AKTÍVNY SPLIT: <span class="text-cyan">{{ program.split_type if program else 'NONE' }}</span></p>
+        </div>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <form method="POST" action="{{ url_for('dashboard.regenerate_program') }}" onsubmit="return confirm('Naozaj chceš pregenerovať plán?');" class="m-0">
+                <button type="submit" class="btn btn-outline-premium border-cyan text-cyan py-2 px-3">🔄 Rýchla REGENERÁCIA</button>
+            </form>
+            <a href="{{ url_for('onboarding.step1') }}" class="btn btn-outline-premium border-pink text-pink py-2 px-3" onclick="return confirm('Naozaj chceš začať odznova?');">✨ NOVÝ ONBOARDING</a>
+            <a href="{{ url_for('profile.index') }}" class="btn btn-outline-premium py-2 px-3">← SPÄŤ</a>
+        </div>
+    </div>
+
+    {% if not program %}
+    <div class="col-12">
+        <div class="glass-card text-center py-5">
+            <h5 class="text-secondary outfit opacity-50 mb-4">Zatiaľ nemáš vygenerovaný program.</h5>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-premium px-5 py-3">VYGENEROVAŤ TERAZ</a>
+        </div>
+    </div>
+    {% else %}
+    
+    <form id="training-update-form" method="POST" action="{{ url_for('profile.training_update') }}"></form>
+
+    <!-- Hromadné nastavenie časovačov -->
+    <div class="col-12 mb-4">
+        <div class="glass-card">
+            <h5 class="text-white outfit mb-4">HROMADNÉ NASTAVENIE PAUZY</h5>
+            <form method="POST" action="{{ url_for('profile.training_bulk_timers') }}" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="text-secondary outfit small tracking-widest mb-1">KOMPLEXNÉ CVIKY</label>
+                    <div class="input-group glass-card p-0" style="background: rgba(255,255,255,0.05);">
+                        <input type="number" name="bulk_compound" class="form-control border-0 bg-transparent text-white text-center outfit" placeholder="240">
+                        <span class="input-group-text bg-transparent border-0 text-secondary outfit small">sekúnd</span>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <label class="text-secondary outfit small tracking-widest mb-1">IZOLAČNÉ CVIKY</label>
+                    <div class="input-group glass-card p-0" style="background: rgba(255,255,255,0.05);">
+                        <input type="number" name="bulk_isolation" class="form-control border-0 bg-transparent text-white text-center outfit" placeholder="180">
+                        <span class="input-group-text bg-transparent border-0 text-secondary outfit small">sekúnd</span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-premium w-100 py-2">APLIKOVAŤ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Prehľad dní a cvikov -->
+    <div class="col-12">
+        <div class="row g-4">
+            {% for wd in workout_days %}
+            <div class="col-lg-6">
+                <div class="glass-card h-100 p-0 overflow-hidden workout-day-card" data-day-id="{{ wd.id }}">
+                    <div class="px-4 py-3 border-bottom border-white border-opacity-10 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: rgba(255,255,255,0.02);">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <select name="day_of_week_{{ wd.id }}" form="training-update-form" class="premium-select">
+                                <option value="0" {% if wd.day_of_week == 0 %}selected{% endif %}>Pondelok</option>
+                                <option value="1" {% if wd.day_of_week == 1 %}selected{% endif %}>Utorok</option>
+                                <option value="2" {% if wd.day_of_week == 2 %}selected{% endif %}>Streda</option>
+                                <option value="3" {% if wd.day_of_week == 3 %}selected{% endif %}>Štvrtok</option>
+                                <option value="4" {% if wd.day_of_week == 4 %}selected{% endif %}>Piatok</option>
+                                <option value="5" {% if wd.day_of_week == 5 %}selected{% endif %}>Sobota</option>
+                                <option value="6" {% if wd.day_of_week == 6 %}selected{% endif %}>Nedeľa</option>
+                            </select>
+                            <span class="badge badge-premium small">{{ wd.day_type }}</span>
+                            <div class="d-inline-flex gap-2 card-actions ms-2" id="actions_day_{{ wd.id }}">
+                                <button type="button" class="btn btn-sm btn-outline-premium py-1 px-3 small back-day-btn">SPÄŤ</button>
+                                <button type="submit" form="training-update-form" class="btn btn-sm btn-premium py-1 px-3 small">ULOŽIŤ</button>
+                            </div>
+                        </div>
+                        <span class="text-secondary outfit small opacity-50">{{ wd.exercises | length }} cvikov</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            {% for ex in wd.exercises %}
+                            <div class="glass-card p-3 border-0 position-relative exercise-row-card" data-exercise-id="{{ ex.id }}" style="background: rgba(255,255,255,0.02);">
+                                <form method="POST" action="{{ url_for('profile.training_delete', exercise_id=ex.id) }}" class="position-absolute top-0 end-0 m-2" onsubmit="return confirm('Zmazať {{ ex.name }}?');">
+                                    <button type="submit" class="btn btn-link text-pink border-0 p-0 opacity-50 hover-opacity-100" title="Zmazať">✕</button>
+                                </form>
+                                
+                                <div class="row g-2">
+                                    <div class="col-12 pe-4">
+                                        <label class="text-white outfit small tracking-widest mb-0.5" style="font-size: 0.6rem;">CVIK</label>
+                                        <input type="text" name="name_{{ ex.id }}" form="training-update-form" class="form-control form-control-sm border-0 border-bottom border-white border-opacity-10 bg-transparent text-white outfit px-0 rounded-0" value="{{ ex.name }}" required>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="text-white outfit small tracking-widest mb-0.5" style="font-size: 0.6rem;">SÉRIE</label>
+                                        <input type="number" name="sets_{{ ex.id }}" form="training-update-form" class="form-control form-control-sm border-0 bg-white bg-opacity-5 text-white text-center outfit" value="{{ ex.sets_working }}" required>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="text-white outfit small tracking-widest mb-0.5" style="font-size: 0.6rem;">MIN</label>
+                                        <input type="number" name="reps_min_{{ ex.id }}" form="training-update-form" class="form-control form-control-sm border-0 bg-white bg-opacity-5 text-white text-center outfit" value="{{ ex.reps_min }}" required>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="text-white outfit small tracking-widest mb-0.5" style="font-size: 0.6rem;">MAX</label>
+                                        <input type="number" name="reps_max_{{ ex.id }}" form="training-update-form" class="form-control form-control-sm border-0 bg-white bg-opacity-5 text-white text-center outfit" value="{{ ex.reps_max }}" required>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="text-white outfit small tracking-widest mb-0.5" style="font-size: 0.6rem;">PAUZA</label>
+                                        <input type="number" name="rest_{{ ex.id }}" form="training-update-form" class="form-control form-control-sm border-0 bg-white bg-opacity-5 text-cyan text-center outfit fw-bold" value="{{ ex.rest_seconds }}" required>
+                                    </div>
+                                    <div class="col-12 mt-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <div class="form-check form-switch p-0 d-flex align-items-center gap-2">
+                                            <input class="form-check-input ms-0 mt-0" type="checkbox" name="is_compound_{{ ex.id }}" form="training-update-form" id="compound_{{ ex.id }}" {% if ex.is_compound %}checked{% endif %}>
+                                            <label class="text-white outfit" style="font-size: 0.65rem;" for="compound_{{ ex.id }}">KOMPLEXNÝ CVIK</label>
+                                        </div>
+                                        <div class="d-flex gap-2 card-actions" id="actions_ex_{{ ex.id }}">
+                                            <button type="button" class="btn btn-sm btn-outline-premium py-1 px-3 small back-ex-btn">SPÄŤ</button>
+                                            <button type="submit" form="training-update-form" class="btn btn-sm btn-premium py-1 px-3 small">ULOŽIŤ</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="border-top border-white border-opacity-5 pt-3 text-center">
+                            <button type="button" class="btn btn-sm btn-link text-cyan text-decoration-none outfit small tracking-widest" data-bs-toggle="collapse" data-bs-target="#addCollapse_{{ wd.id }}">
+                                + PRIDAŤ CVIK
+                            </button>
+                        </div>
+
+                        <div class="collapse mt-3" id="addCollapse_{{ wd.id }}">
+                            <div class="glass-card p-3 border-cyan border-opacity-20" style="background: rgba(0, 245, 255, 0.02);">
+                                <h6 class="text-cyan outfit mb-3 small tracking-widest">NOVÝ CVIK</h6>
+                                <form method="POST" action="{{ url_for('profile.training_add') }}">
+                                    <input type="hidden" name="workout_day_id" value="{{ wd.id }}">
+                                    <div class="row g-2">
+                                        <div class="col-12">
+                                            <input type="text" name="name" class="form-control form-control-sm border-white border-opacity-10 bg-transparent text-white" placeholder="Názov cviku" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <input type="text" name="muscle_group" class="form-control form-control-sm border-white border-opacity-10 bg-transparent text-secondary" placeholder="Svalová skupina" value="Other">
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="number" name="sets" class="form-control form-control-sm border-white border-opacity-10 bg-transparent text-white text-center" value="3" required>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="number" name="reps_min" class="form-control form-control-sm border-white border-opacity-10 bg-transparent text-white text-center" value="8" required>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="number" name="reps_max" class="form-control form-control-sm border-white border-opacity-10 bg-transparent text-white text-center" value="12" required>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="number" name="rest_seconds" class="form-control form-control-sm border-white border-opacity-10 bg-transparent text-cyan text-center" value="180" required>
+                                        </div>
+                                        <div class="col-12 d-flex justify-content-between align-items-center mt-2">
+                                            <div class="form-check form-switch p-0 d-flex align-items-center gap-2">
+                                                <input class="form-check-input ms-0 mt-0" type="checkbox" name="is_compound" id="new_compound_{{ wd.id }}">
+                                                <label class="text-secondary outfit small" for="new_compound_{{ wd.id }}">KOMPLEXNÝ</label>
+                                            </div>
+                                            <button type="submit" class="btn btn-sm btn-premium py-1 px-3">PRIDAŤ</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Logika pre výber dňa v týždni (hlavička karty)
+    const cards = document.querySelectorAll('.workout-day-card');
+    cards.forEach(card => {
+        const dayId = card.getAttribute('data-day-id');
+        const select = card.querySelector('select.premium-select');
+        const actions = document.getElementById('actions_day_' + dayId);
+        if (!select || !actions) return;
+        
+        select.setAttribute('data-original-value', select.value);
+        
+        function updateDayActionsVisibility() {
+            const original = select.getAttribute('data-original-value');
+            if (select.value !== original) {
+                actions.classList.add('show-actions');
+            } else {
+                actions.classList.remove('show-actions');
+            }
+        }
+        
+        select.addEventListener('change', updateDayActionsVisibility);
+        
+        const backDayBtn = actions.querySelector('.back-day-btn');
+        if (backDayBtn) {
+            backDayBtn.addEventListener('click', function() {
+                select.value = select.getAttribute('data-original-value');
+                updateDayActionsVisibility();
+            });
+        }
+
+        const saveDayBtn = actions.querySelector('button[type="submit"]');
+        if (saveDayBtn) {
+            saveDayBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                saveDayBtn.disabled = true;
+                const originalText = saveDayBtn.innerText;
+                saveDayBtn.innerText = 'Ukladám...';
+                
+                fetch('/profile/training/update_day/' + dayId, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ day_of_week: select.value })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    saveDayBtn.disabled = false;
+                    if (data.success) {
+                        select.setAttribute('data-original-value', select.value);
+                        updateDayActionsVisibility();
+                        saveDayBtn.innerText = 'ULOŽENÉ ✓';
+                        saveDayBtn.classList.replace('btn-premium', 'btn-success');
+                        setTimeout(() => {
+                            saveDayBtn.innerText = originalText;
+                            saveDayBtn.classList.replace('btn-success', 'btn-premium');
+                        }, 1500);
+                    } else {
+                        saveDayBtn.innerText = originalText;
+                        alert("Chyba pri ukladaní dňa: " + (data.error || "Neznáma chyba"));
+                    }
+                })
+                .catch(err => {
+                    saveDayBtn.disabled = false;
+                    saveDayBtn.innerText = originalText;
+                    alert("Chyba pri spojení so serverom.");
+                });
+            });
+        }
+    });
+
+    // 2. Logika pre jednotlivé cviky (tlačidlá priamo v riadku cviku)
+    const exCards = document.querySelectorAll('.exercise-row-card');
+    exCards.forEach(exCard => {
+        const exId = exCard.getAttribute('data-exercise-id');
+        const actions = document.getElementById('actions_ex_' + exId);
+        if (!actions) return;
+        
+        const inputs = exCard.querySelectorAll('[form="training-update-form"]');
+        
+        inputs.forEach(input => {
+            if (input.type === 'checkbox') {
+                input.setAttribute('data-original-value', input.checked ? 'true' : 'false');
+            } else {
+                input.setAttribute('data-original-value', input.value);
+            }
+        });
+        
+        function updateExActionsVisibility() {
+            let isDirty = false;
+            inputs.forEach(input => {
+                const original = input.getAttribute('data-original-value');
+                if (input.type === 'checkbox') {
+                    const current = input.checked ? 'true' : 'false';
+                    if (current !== original) isDirty = true;
+                } else {
+                    if (input.value !== original) isDirty = true;
+                }
+            });
+            
+            if (isDirty) {
+                actions.classList.add('show-actions');
+            } else {
+                actions.classList.remove('show-actions');
+            }
+        }
+        
+        exCard.addEventListener('input', function(e) {
+            if (e.target.form && e.target.form.id === 'training-update-form') {
+                updateExActionsVisibility();
+            }
+        });
+        
+        exCard.addEventListener('change', function(e) {
+            if (e.target.form && e.target.form.id === 'training-update-form') {
+                updateExActionsVisibility();
+            }
+        });
+        
+        const backExBtn = actions.querySelector('.back-ex-btn');
+        if (backExBtn) {
+            backExBtn.addEventListener('click', function() {
+                inputs.forEach(input => {
+                    const original = input.getAttribute('data-original-value');
+                    if (input.type === 'checkbox') {
+                        input.checked = (original === 'true');
+                    } else {
+                        input.value = original;
+                    }
+                });
+                updateExActionsVisibility();
+            });
+        }
+
+        const saveExBtn = actions.querySelector('button[type="submit"]');
+        if (saveExBtn) {
+            saveExBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const nameInput = exCard.querySelector('[name="name_' + exId + '"]');
+                const setsInput = exCard.querySelector('[name="sets_' + exId + '"]');
+                const repsMinInput = exCard.querySelector('[name="reps_min_' + exId + '"]');
+                const repsMaxInput = exCard.querySelector('[name="reps_max_' + exId + '"]');
+                const restInput = exCard.querySelector('[name="rest_' + exId + '"]');
+                const compoundInput = exCard.querySelector('[name="is_compound_' + exId + '"]');
+                
+                if (!nameInput.value || !setsInput.value || !repsMinInput.value || !repsMaxInput.value || !restInput.value) {
+                    alert("Prosím vyplň všetky povinné polia cviku!");
+                    return;
+                }
+                
+                saveExBtn.disabled = true;
+                const originalText = saveExBtn.innerText;
+                saveExBtn.innerText = 'Ukladám...';
+                
+                const payload = {
+                    name: nameInput.value,
+                    sets: setsInput.value,
+                    reps_min: repsMinInput.value,
+                    reps_max: repsMaxInput.value,
+                    rest: restInput.value,
+                    is_compound: compoundInput ? compoundInput.checked : false
+                };
+                
+                fetch('/profile/training/update_exercise/' + exId, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    saveExBtn.disabled = false;
+                    if (data.success) {
+                        inputs.forEach(input => {
+                            if (input.type === 'checkbox') {
+                                input.setAttribute('data-original-value', input.checked ? 'true' : 'false');
+                            } else {
+                                input.setAttribute('data-original-value', input.value);
+                            }
+                        });
+                        updateExActionsVisibility();
+                        
+                        saveExBtn.innerText = 'ULOŽENÉ ✓';
+                        saveExBtn.classList.replace('btn-premium', 'btn-success');
+                        setTimeout(() => {
+                            saveExBtn.innerText = originalText;
+                            saveExBtn.classList.replace('btn-success', 'btn-premium');
+                        }, 1500);
+                    } else {
+                        saveExBtn.innerText = originalText;
+                        alert("Chyba pri ukladaní cviku: " + (data.error || "Neznáma chyba"));
+                    }
+                })
+                .catch(err => {
+                    saveExBtn.disabled = false;
+                    saveExBtn.innerText = originalText;
+                    alert("Chyba pri spojení so serverom.");
+                });
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

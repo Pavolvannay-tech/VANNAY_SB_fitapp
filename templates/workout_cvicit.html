@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <!-- Active Workout Banner -->
+        {% if session.get('active_workout_day_id') %}
+        <div class="glass-card border-0 p-4 mb-4" style="background: rgba(255, 193, 7, 0.08); border-left: 4px solid #ffc107 !important; border-radius: 12px; backdrop-filter: blur(10px);">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <span class="fs-4">⚡</span>
+                <h5 class="text-warning outfit mb-0">Aktuálne máš rozrobený tréning</h5>
+            </div>
+            <p class="text-secondary small mb-3">Máš rozpracovaný tréning <strong>{{ session.get('active_workout_name') }}</strong>. Môžeš sa k nemu vrátiť alebo ho zrušiť a začať nový.</p>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('workout.active_workout') }}" class="btn btn-sm btn-premium px-3 py-2">
+                    <small>POKRAČOVAŤ</small>
+                </a>
+                <a href="{{ url_for('workout.cancel_workout') }}" class="btn btn-sm btn-outline-danger px-3 py-2" onclick="return confirm('Naozaj chceš zrušiť rozrobený tréning? Všetky neuložené zmeny sa stratia.');">
+                    <small>ZRUŠIŤ</small>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+            <div>
+                <h1 class="text-white mb-1 outfit">CVIČIŤ</h1>
+                <p class="text-secondary fs-5 mb-0 outfit small tracking-widest opacity-75">AKTÍVNY SPLIT: <span class="text-cyan">{{ program.split_type }}</span></p>
+            </div>
+            <a href="{{ url_for('profile.training_settings') }}" class="btn btn-outline-premium">
+                Upraviť split
+            </a>
+        </div>
+
+        <!-- Sessions Card -->
+        <div class="glass-card p-0 overflow-hidden">
+            <div class="px-4 py-3 border-bottom border-white border-opacity-10 bg-black bg-opacity-20">
+                <h5 class="mb-0 text-white outfit small tracking-widest">SESSIONS</h5>
+            </div>
+            <div class="p-4 d-flex flex-column gap-3">
+                {% if today_workout %}
+                <div class="glass-card border-0 p-3 mb-2" style="background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--accent-green) !important; border-radius: 12px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="fs-4">🔥</span>
+                        <div>
+                            <h6 class="text-white outfit mb-1">Dnes máš tréning!</h6>
+                            <p class="text-secondary small mb-0">{{ today_workout.day_type }} Workout</p>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="glass-card border-0 p-3 mb-2" style="background: rgba(0, 122, 255, 0.05); border-left: 3px solid var(--accent-blue) !important; border-radius: 12px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="fs-4">🛌</span>
+                        <div>
+                            <h6 class="text-white outfit mb-1">Dnes regeneruješ</h6>
+                            <p class="text-secondary small mb-0">Zaslúžený oddych.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <label class="text-secondary outfit tracking-widest opacity-50 mb-1" style="font-size: 0.65rem;">TVOJ PROGRAM</label>
+
+                <div class="d-flex flex-column gap-3">
+                    {% for wd in workout_days %}
+                    <div class="glass-card p-3" style="background: rgba(255,255,255,0.02);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white outfit mb-1">{{ wd.day_type }}</h6>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <span class="badge bg-white bg-opacity-5 text-secondary border border-white border-opacity-10 small" style="font-size: 0.6rem;">
+                                        {{ ['PO', 'UT', 'ST', 'ŠT', 'PI', 'SO', 'NE'][wd.day_of_week] }}
+                                    </span>
+                                    <span class="text-secondary opacity-50" style="font-size: 0.7rem;">• {{ wd.exercises | length if wd.exercises else '0' }} cvikov</span>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('workout.session_workout', workout_day_id=wd.id) }}" class="btn btn-sm btn-premium py-2 px-3">
+                                <small>START</small>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+           </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

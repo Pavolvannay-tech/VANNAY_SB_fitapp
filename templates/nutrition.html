@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12 mb-3 d-flex justify-content-between align-items-end flex-wrap gap-3">
+        <div>
+            <h1 class="text-white mb-1 outfit">VÝŽIVA A PALIVO</h1>
+            <p class="text-secondary fs-5 mb-0 outfit small tracking-widest opacity-75">CIEĽ: <span class="text-cyan">{{ user.goal | upper }}</span></p>
+        </div>
+        <button type="button" class="btn btn-outline-premium" data-bs-toggle="modal" data-bs-target="#editGoalsModal">
+            Upraviť ciele
+        </button>
+    </div>
+
+    <!-- Progress Bars -->
+    <div class="col-12">
+        <div class="glass-card">
+            <h4 class="mb-4 text-white outfit">DNEŠNÝ PRÍJEM</h4>
+
+            {% set cal_pct = (sum_cals / user.calories_target * 100) | round if user.calories_target else 0 %}
+            {% set pro_pct = (sum_pro / user.protein_target_g * 100) | round if user.protein_target_g else 0 %}
+            {% set carb_pct = (sum_carb / user.carb_target_g * 100) | round if user.carb_target_g else 0 %}
+            {% set fat_pct = (sum_fat / user.fat_target_g * 100) | round if user.fat_target_g else 0 %}
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-white outfit small tracking-widest opacity-75">KALÓRIE</span>
+                            <span class="text-{{ 'neon-green' if cal_pct <= 100 else 'pink' }} outfit">{{ sum_cals }} / {{ user.calories_target }} kcal</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: {{ cal_pct if cal_pct <= 100 else 100 }}%; background: {{ 'var(--accent-green)' if cal_pct <= 100 else 'var(--accent-pink)' }};"></div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-white outfit small tracking-widest opacity-75">BIELKOVINY</span>
+                            <span class="text-cyan outfit">{{ sum_pro }}g / {{ user.protein_target_g }}g</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: {{ pro_pct if pro_pct <= 100 else 100 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-white outfit small tracking-widest opacity-75">SACHARIDY</span>
+                            <span class="text-white outfit">{{ sum_carb }}g / {{ user.carb_target_g }}g</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: {{ carb_pct if carb_pct <= 100 else 100 }}%; background: var(--accent-yellow);"></div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-white outfit small tracking-widest opacity-75">TUKY</span>
+                            <span class="text-pink outfit">{{ sum_fat }}g / {{ user.fat_target_g }}g</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: {{ fat_pct if fat_pct <= 100 else 100 }}%; background: var(--accent-pink);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulár + History -->
+    <div class="col-lg-5">
+        <div class="glass-card h-100">
+            <h5 class="text-white outfit mb-4">PRIDAŤ JEDLO</h5>
+            <form method="POST" action="{{ url_for('nutrition.add') }}" class="needs-validation" novalidate>
+                <div class="mb-4">
+                    <label class="text-white outfit small tracking-widest mb-1">KALÓRIE (KCAL)</label>
+                    <input type="number" class="form-control" name="calories" required min="1">
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-4">
+                        <label class="text-white outfit small tracking-widest mb-1">PROTEÍN</label>
+                        <input type="number" step="0.1" class="form-control" name="protein_g" value="0">
+                    </div>
+                    <div class="col-4">
+                        <label class="text-white outfit small tracking-widest mb-1">SACHY</label>
+                        <input type="number" step="0.1" class="form-control" name="carbs_g" value="0">
+                    </div>
+                    <div class="col-4">
+                        <label class="text-white outfit small tracking-widest mb-1">TUKY</label>
+                        <input type="number" step="0.1" class="form-control" name="fat_g" value="0">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-premium w-100 py-3">LOGNUT JEDLO</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="glass-card h-100 p-0 overflow-hidden">
+            <div class="px-4 py-3 border-bottom border-white border-opacity-10 d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.02);">
+                <h5 class="mb-0 text-white outfit small tracking-widest">DNEŠNÝ LOG</h5>
+                <span class="badge badge-premium">PRIEMER: {{ avg_cal }} KCAL</span>
+            </div>
+            <div class="p-0 overflow-auto" style="max-height: 400px;">
+                <table class="table table-borderless align-middle mb-0 text-center">
+                    <thead class="border-bottom border-white border-opacity-5">
+                        <tr class="text-secondary outfit tracking-widest opacity-50" style="font-size: 0.7rem;">
+                            <th class="py-3">KCAL</th>
+                            <th class="py-3">PRO</th>
+                            <th class="py-3">CARB</th>
+                            <th class="py-3">FAT</th>
+                            <th class="py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr class="border-bottom border-white border-opacity-5">
+                            <td class="text-white outfit">{{ log.calories }}</td>
+                            <td class="text-cyan small">{{ log.protein_g }}g</td>
+                            <td class="text-white small">{{ log.carbs_g }}g</td>
+                            <td class="text-pink small">{{ log.fat_g }}g</td>
+                            <td>
+                                <a href="{{ url_for('nutrition.delete', id=log.id) }}" class="text-secondary opacity-25 text-decoration-none" onclick="return confirm('Zmazať?')">✕</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="py-5 text-secondary opacity-50 small outfit">Zatiaľ žiadne záznamy.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="col-12 mt-4">
+        <div class="glass-card p-0 overflow-hidden">
+             <div class="px-4 py-3 border-bottom border-white border-opacity-10 d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: rgba(255,255,255,0.02);">
+                <h5 class="mb-0 text-white outfit small tracking-widest">VÝVOJ PRÍJMU</h5>
+                <select id="macroSelector" class="premium-select">
+                    <option value="calories" selected>Kalórie</option>
+                    <option value="protein_g">Bielkoviny</option>
+                    <option value="carbs_g">Sacharidy</option>
+                    <option value="fat_g">Tuky</option>
+                </select>
+            </div>
+            <div class="p-4">
+                <div style="height: 350px;">
+                    <canvas id="macroChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Modal -->
+<div class="modal fade" id="editGoalsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card p-0 border-0 overflow-hidden">
+            <div class="modal-header border-bottom border-white border-opacity-10 bg-black bg-opacity-20 px-4 py-3">
+                <h5 class="modal-title outfit text-white">UPRAVIŤ CIELE</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('nutrition.edit_goals') }}">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="text-white outfit small tracking-widest mb-1">KALÓRIE</label>
+                        <input type="number" class="form-control" name="calories_target" value="{{ user.calories_target }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-white outfit small tracking-widest mb-1">BIELKOVINY (G)</label>
+                        <input type="number" step="0.1" class="form-control" name="protein_target_g" value="{{ user.protein_target_g }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-white outfit small tracking-widest mb-1">SACHARIDY (G)</label>
+                        <input type="number" step="0.1" class="form-control" name="carb_target_g" value="{{ user.carb_target_g }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-white outfit small tracking-widest mb-1">TUKY (G)</label>
+                        <input type="number" step="0.1" class="form-control" name="fat_target_g" value="{{ user.fat_target_g }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-3">
+                    <button type="submit" class="btn btn-premium w-100 py-3">ULOŽIŤ ZMENY</button>
+                    <button type="button" class="btn btn-link text-secondary text-decoration-none mx-auto mt-2" data-bs-dismiss="modal">Zrušiť</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/nutrition.js') }}"></script>
+{% endblock %}
