@@ -7,7 +7,7 @@
         {% if session.get('active_workout_day_id') %}
         <div class="glass-card border-0 p-4 mb-4" style="background: rgba(255, 193, 7, 0.08); border-left: 4px solid #ffc107 !important; border-radius: 12px; backdrop-filter: blur(10px);">
             <div class="d-flex align-items-center gap-3 mb-2">
-                <span class="fs-4">⚡</span>
+                <i class="bi bi-lightning-charge-fill text-warning fs-4"></i>
                 <h5 class="text-warning outfit mb-0">Aktuálne máš rozrobený tréning</h5>
             </div>
             <p class="text-secondary small mb-3">Máš rozpracovaný tréning <strong>{{ session.get('active_workout_name') }}</strong>. Môžeš sa k nemu vrátiť alebo ho zrušiť a začať nový.</p>
@@ -42,7 +42,7 @@
                 {% if today_workout %}
                 <div class="glass-card border-0 p-3 mb-2" style="background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--accent-green) !important; border-radius: 12px;">
                     <div class="d-flex align-items-center gap-3">
-                        <span class="fs-4">🔥</span>
+                        <i class="bi bi-calendar-check text-success fs-4"></i>
                         <div>
                             <h6 class="text-white outfit mb-1">Dnes máš tréning!</h6>
                             <p class="text-secondary small mb-0">{{ today_workout.day_type }} Workout</p>
@@ -52,7 +52,7 @@
                 {% else %}
                 <div class="glass-card border-0 p-3 mb-2" style="background: rgba(0, 122, 255, 0.05); border-left: 3px solid var(--accent-blue) !important; border-radius: 12px;">
                     <div class="d-flex align-items-center gap-3">
-                        <span class="fs-4">🛌</span>
+                        <i class="bi bi-moon-stars text-primary fs-4"></i>
                         <div>
                             <h6 class="text-white outfit mb-1">Dnes regeneruješ</h6>
                             <p class="text-secondary small mb-0">Zaslúžený oddych.</p>

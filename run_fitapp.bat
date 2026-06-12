@@ -12,6 +12,10 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
+if exist venv\Scripts\activate.bat (
+    call venv\Scripts\activate.bat
+)
+
 :: Spustenie aplikacie
 echo Aplikacia pobezi na: http://127.0.0.1:8080
 echo Pre ukoncenie zavri toto okno alebo stlac Ctrl+C.

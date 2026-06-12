@@ -79,15 +79,15 @@
                 <div class="row g-3 mb-4">
                     <div class="col-4">
                         <label class="text-white outfit small tracking-widest mb-1">PROTEÍN</label>
-                        <input type="number" step="0.1" class="form-control" name="protein_g" value="0">
+                        <input type="number" step="0.1" class="form-control" name="protein_g" placeholder="0">
                     </div>
                     <div class="col-4">
                         <label class="text-white outfit small tracking-widest mb-1">SACHY</label>
-                        <input type="number" step="0.1" class="form-control" name="carbs_g" value="0">
+                        <input type="number" step="0.1" class="form-control" name="carbs_g" placeholder="0">
                     </div>
                     <div class="col-4">
                         <label class="text-white outfit small tracking-widest mb-1">TUKY</label>
-                        <input type="number" step="0.1" class="form-control" name="fat_g" value="0">
+                        <input type="number" step="0.1" class="form-control" name="fat_g" placeholder="0">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-premium w-100 py-3">LOGNUT JEDLO</button>
@@ -120,7 +120,7 @@
                             <td class="text-white small">{{ log.carbs_g }}g</td>
                             <td class="text-pink small">{{ log.fat_g }}g</td>
                             <td>
-                                <a href="{{ url_for('nutrition.delete', id=log.id) }}" class="text-secondary opacity-25 text-decoration-none" onclick="return confirm('Zmazať?')">✕</a>
+                                <a href="{{ url_for('nutrition.delete', id=log.id) }}" class="text-danger opacity-75 text-decoration-none" onclick="return confirm('Zmazať?')">✕</a>
                             </td>
                         </tr>
                         {% else %}

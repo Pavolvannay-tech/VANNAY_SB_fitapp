@@ -48,7 +48,7 @@
                     {% for field, label in areas %}
                     <div class="col-md-6">
                         <label class="text-secondary outfit small tracking-widest mb-2">{{ label | upper }}</label>
-                        <select name="{{ field }}" class="form-select bg-black text-white border-white border-opacity-10 outfit py-2" required style="background: rgba(255,255,255,0.05);">
+                        <select name="{{ field }}" class="premium-select w-100" required style="height: 48px; padding-top: 10px; padding-bottom: 10px; border-radius: 10px;">
                             <option value="" disabled selected>Vyber...</option>
                             {% for opt in options[field] %}
                             <option value="{{ opt }}">{{ opt }}</option>

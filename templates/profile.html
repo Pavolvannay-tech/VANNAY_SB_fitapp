@@ -21,7 +21,7 @@
                     </div>
                     <div class="col-6">
                         <label class="text-white outfit small tracking-widest mb-1">POHLAVIE</label>
-                        <select class="form-select bg-black text-white border-white border-opacity-10 outfit small" name="gender" style="height: 48px; background: rgba(255,255,255,0.05);">
+                        <select class="premium-select w-100" name="gender" style="height: 48px; padding-top: 10px; padding-bottom: 10px; border-radius: 10px;">
                             <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Muž</option>
                             <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Žena</option>
                         </select>

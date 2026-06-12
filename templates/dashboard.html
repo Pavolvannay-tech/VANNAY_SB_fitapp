@@ -4,7 +4,7 @@
 <div class="row g-4">
     <!-- Header / Welcome -->
     <div class="col-12 text-center text-md-start mb-4">
-        <h1 class="text-white">Nazdar, <span class="text-gradient-blue">{{ session.get('name', 'Pripravený na tréning?') }}</span>! 👋</h1>
+        <h1 class="text-white">Nazdar, <span class="text-gradient-blue">{{ session.get('name', 'Pripravený na tréning?') }}</span>!</h1>
         <p class="text-secondary fs-5">Tvoj osobný progres centrum.</p>
     </div>
 
@@ -34,7 +34,7 @@
             <div class="card-body p-4 p-md-5">
                 {% if not today_workout %}
                     <div class="text-center py-5">
-                        <h2 class="text-white mb-3">Dnes regeneruješ 🛌</h2>
+                        <h2 class="text-white mb-3">Dnes regeneruješ</h2>
                         <p class="text-secondary fs-5 mx-auto mb-4" style="max-width: 600px;">
                             Svaly rastú počas oddychu, nie počas tréningu. Uži si voľno a naber sily na zajtra.
                         </p>
@@ -50,7 +50,7 @@
                             <h1 class="text-white display-4 mb-2">{{ today_workout.day_type }} Session</h1>
                             <p class="text-secondary fs-5 mb-4">Konzistentnosť je matka progresu. Poďme na to.</p>
                             <div class="d-flex gap-3">
-                                <a href="{{ url_for('workout.session_workout', workout_day_id=today_workout.id) }}" class="btn btn-premium px-5 py-3">Začať tréning 🚀</a>
+                                <a href="{{ url_for('workout.session_workout', workout_day_id=today_workout.id) }}" class="btn btn-premium px-5 py-3">Začať tréning</a>
                             </div>
                         </div>
                         <div class="col-md-5">

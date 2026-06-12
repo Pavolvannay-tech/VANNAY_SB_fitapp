@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from routes import get_supabase, login_required
 from nutrition import calculate_macros
 from program_generator import generate_program
@@ -10,46 +10,80 @@ supabase = get_supabase()
 @login_required
 def step1():
     if request.method == 'POST':
-        data = {
-            'name': request.form.get('name'),
-            'age': int(request.form.get('age')),
-            'gender': request.form.get('gender'),
-            'weight_kg': float(request.form.get('weight_kg')),
-            'height_cm': float(request.form.get('height_cm'))
-        }
-        supabase.table('users').update(data).eq('id', session['user_id']).execute()
-        return redirect(url_for('onboarding.step2'))
+        name = request.form.get('name')
+        age_raw = request.form.get('age')
+        gender = request.form.get('gender')
+        weight_raw = request.form.get('weight_kg')
+        height_raw = request.form.get('height_cm')
+        
+        if not all([name, age_raw, gender, weight_raw, height_raw]):
+            flash("Nie sú vyplnené všetky údaje.", "danger")
+            return redirect(url_for('onboarding.step1'))
+            
+        try:
+            data = {
+                'name': name,
+                'age': int(age_raw),
+                'gender': gender,
+                'weight_kg': float(weight_raw),
+                'height_cm': float(height_raw)
+            }
+            supabase.table('users').update(data).eq('id', session['user_id']).execute()
+            return redirect(url_for('onboarding.step2'))
+        except (ValueError, TypeError):
+            flash("Nie sú vyplnené všetky údaje.", "danger")
+            return redirect(url_for('onboarding.step1'))
     return render_template('onboarding/step1.html')
 
 @bp.route('/2', methods=['GET', 'POST'])
 @login_required
 def step2():
     if request.method == 'POST':
-        data = {
-            'experience': request.form.get('experience'),
-            'training_days': int(request.form.get('training_days')),
-            'session_duration': int(request.form.get('session_duration'))
-        }
-        supabase.table('users').update(data).eq('id', session['user_id']).execute()
-        return redirect(url_for('onboarding.step3'))
+        experience = request.form.get('experience')
+        training_days_raw = request.form.get('training_days')
+        session_duration_raw = request.form.get('session_duration')
+        
+        if not all([experience, training_days_raw, session_duration_raw]):
+            flash("Nie sú vyplnené všetky údaje.", "danger")
+            return redirect(url_for('onboarding.step2'))
+            
+        try:
+            data = {
+                'experience': experience,
+                'training_days': int(training_days_raw),
+                'session_duration': int(session_duration_raw)
+            }
+            supabase.table('users').update(data).eq('id', session['user_id']).execute()
+            return redirect(url_for('onboarding.step3'))
+        except (ValueError, TypeError):
+            flash("Nie sú vyplnené všetky údaje.", "danger")
+            return redirect(url_for('onboarding.step2'))
     return render_template('onboarding/step2.html')
 
 @bp.route('/3', methods=['GET', 'POST'])
 @login_required
 def step3():
     if request.method == 'POST':
-        data = {
-            'exercise_chest_flat': request.form.get('exercise_chest_flat'),
-            'exercise_chest_incline': request.form.get('exercise_chest_incline'),
-            'exercise_back_vertical': request.form.get('exercise_back_vertical'),
-            'exercise_back_horizontal_wide': request.form.get('exercise_back_horizontal_wide'),
-            'exercise_back_horizontal_close': request.form.get('exercise_back_horizontal_close'),
-            'exercise_shoulders': request.form.get('exercise_shoulders'),
-            'exercise_triceps': request.form.get('exercise_triceps'),
-            'exercise_biceps': request.form.get('exercise_biceps'),
-            'exercise_quads': request.form.get('exercise_quads'),
-            'exercise_hamstrings': request.form.get('exercise_hamstrings')
-        }
+        fields = [
+            'exercise_chest_flat', 'exercise_chest_incline',
+            'exercise_back_vertical', 'exercise_back_horizontal_wide',
+            'exercise_back_horizontal_close', 'exercise_shoulders',
+            'exercise_triceps', 'exercise_biceps',
+            'exercise_quads', 'exercise_hamstrings'
+        ]
+        
+        data = {}
+        missing = False
+        for f in fields:
+            val = request.form.get(f)
+            if not val:
+                missing = True
+            data[f] = val
+            
+        if missing:
+            flash("Nie sú vyplnené všetky údaje.", "danger")
+            return redirect(url_for('onboarding.step3'))
+            
         supabase.table('users').update(data).eq('id', session['user_id']).execute()
         return redirect(url_for('onboarding.step4'))
     return render_template('onboarding/step3.html')
@@ -76,6 +110,10 @@ def step5():
     if request.method == 'POST':
         activity_level = request.form.get('activity_level')
         goal = request.form.get('goal')
+        
+        if not activity_level or not goal:
+            flash("Nie sú vyplnené všetky údaje.", "danger")
+            return redirect(url_for('onboarding.step5'))
         
         user_res = supabase.table('users').select('*').eq('id', session['user_id']).limit(1).execute()
         
